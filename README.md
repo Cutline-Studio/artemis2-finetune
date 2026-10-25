@@ -35,3 +35,10 @@ System prompt and identity answers are derived from:
 - Existing runtime prompts in `artemis-serve.py` / `ChatBox.tsx` / `artemis-cli`
 
 Unknown commercial details (prices, headcount, funding) are refused, not invented.
+
+## Dataset
+
+- **414** clean examples (377 train / 37 eval)
+- Categories (train): {'coding': 202, 'general': 109, 'multiturn': 7, 'identity': 33, 'safety': 26}
+- Sources: {'hand': 85, 'nvidia-build:nvidia/nemotron-3-ultra-550b-a55b': 329}
+- See [`data/DATA_CARD.md`](data/DATA_CARD.md) for licenses, seeds, and the generation script.
