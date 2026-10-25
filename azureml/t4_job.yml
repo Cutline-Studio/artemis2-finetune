@@ -9,6 +9,8 @@ tags:
 code: ..
 compute: azureml:t4-artemis2
 environment:
+  # torch 2.14.1 lives in the image's system Python 3.12 (/usr/local/lib/python3.12),
+  # which is PEP 668 "externally managed", hence --break-system-packages below.
   image: pytorch/pytorch:2.14.1-cuda12.6-cudnn9-runtime
 environment_variables:
   PYTHONPATH: scripts
@@ -17,7 +19,9 @@ environment_variables:
 command: >-
   set -e;
   nvidia-smi;
-  pip install --no-cache-dir -q
+  echo "python=$(command -v python) $(python --version)";
+  python -c "import torch;print('torch',torch.__version__,torch.cuda.is_available())";
+  python -m pip install --break-system-packages --no-cache-dir -q
   transformers==5.20.2 trl==1.16.0 peft==0.21.2 datasets==5.1.0 accelerate==1.15.0
   bitsandbytes==0.50.2 safetensors==0.8.0 huggingface_hub==2.3.0 tokenizers==0.23.3
   pyyaml==6.0.3 sentencepiece protobuf;

@@ -74,6 +74,15 @@ def build_model_and_tokenizer(cfg: dict):
         target_modules=list(cfg["lora_target_modules"]),
     )
     model = get_peft_model(model, lora)
+    # fp16 AMP (T4) needs fp32 master weights for trainable params: GradScaler cannot
+    # unscale bf16/fp16 grads (Azure ML run crimson_shirt_tfhzb9hm6s failed with
+    # "_amp_foreach_non_finite_check_and_unscale_cuda not implemented for 'BFloat16'").
+    if cfg.get("fp16"):
+        for p in model.parameters():
+            if p.requires_grad and p.dtype != torch.float32:
+                p.data = p.data.float()
+    from collections import Counter
+    print(json.dumps({"event": "trainable_dtypes", "counts": dict(Counter(str(p.dtype) for p in model.parameters() if p.requires_grad))}), flush=True)
     model.print_trainable_parameters()
     return model, tok
 
