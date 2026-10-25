@@ -81,3 +81,7 @@ PYTHONPATH=scripts python -u  # eval probes (see smoke/raw_eval.log)
 ## Outcome
 
 Data loading, chat-template assistant-only loss, LoRA training, adapter save, and generate-with-adapter all succeeded on CPU.
+
+## Re-verify after full dataset ({'train_runtime': 25.2, 'train_samples_per_second': 0.119, 'train_steps_per_second': 0.119, 'total_flos': 6018126879744.0, 'train_loss': 1.0293023536602657, 'epoch': 0.125})
+
+See `smoke/raw_train_verify.log`. Adapter saved under `outputs/smoke-cpu-verify/` (not committed).
