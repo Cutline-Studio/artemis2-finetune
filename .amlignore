@@ -1,0 +1,7 @@
+.venv/
+outputs/
+data/raw/
+smoke/
+__pycache__/
+.git/
+.hf-cache*/

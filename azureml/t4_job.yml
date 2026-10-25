@@ -1,0 +1,34 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+# Artemis 2.0 QLoRA SFT on one T4 (Azure ML compute cluster t4-artemis2, Standard_NC8as_T4_v3).
+# Submit: bash azureml/submit_t4.sh
+display_name: artemis2-qwen35-4b-t4-qlora
+experiment_name: artemis2-finetune
+description: QLoRA SFT of Qwen/Qwen3.5-4B on the Artemis 2.0 dataset (377 train / 37 eval), fp16 on T4.
+tags:
+  project: artemis2
+code: ..
+compute: azureml:t4-artemis2
+environment:
+  image: pytorch/pytorch:2.14.1-cuda12.6-cudnn9-runtime
+environment_variables:
+  PYTHONPATH: scripts
+  HF_HUB_DISABLE_TELEMETRY: "1"
+  TOKENIZERS_PARALLELISM: "false"
+command: >-
+  set -e;
+  nvidia-smi;
+  pip install --no-cache-dir -q
+  transformers==5.20.2 trl==1.16.0 peft==0.21.2 datasets==5.1.0 accelerate==1.15.0
+  bitsandbytes==0.50.2 safetensors==0.8.0 huggingface_hub==2.3.0 tokenizers==0.23.3
+  pyyaml==6.0.3 sentencepiece protobuf;
+  python -c "import torch,transformers,trl,peft,bitsandbytes;print('versions',torch.__version__,transformers.__version__,trl.__version__,peft.__version__,bitsandbytes.__version__)";
+  start=$(date +%s);
+  python scripts/train_sft.py --config configs/t4_small.yaml --output-dir ${{outputs.run}};
+  echo "train_seconds=$(( $(date +%s) - start ))";
+  rm -rf ${{outputs.run}}/checkpoint-*;
+  python scripts/eval_prompts.py --base Qwen/Qwen3.5-4B --adapter ${{outputs.run}}/adapter --load-4bit --fp16 --max-samples 37 --out ${{outputs.run}}/eval_report.json;
+  echo "total_seconds=$(( $(date +%s) - start ))"
+outputs:
+  run:
+    type: uri_folder
+    mode: rw_mount

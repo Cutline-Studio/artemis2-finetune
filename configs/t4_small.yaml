@@ -1,0 +1,66 @@
+# QLoRA SFT config for ONE NVIDIA T4 16GB (Azure ML Standard_NC8as_T4_v3).
+# Base model: Qwen/Qwen3.5-4B (Apache-2.0, verified on Hugging Face; 4.66B params,
+# same qwen3_5 architecture as the Qwen3.8-27B H100 target, so the same LoRA
+# target modules / chat template apply).
+# T4 (sm_75) has no bf16 -> fp16 compute, 4-bit NF4, gradient checkpointing.
+model_name_or_path: Qwen/Qwen3.5-4B
+
+output_dir: outputs/t4-run
+run_name: artemis2-qwen35-4b-t4-qlora
+
+train_file: data/train.jsonl
+eval_file: data/eval.jsonl
+# Longest train example is 1510 tokens with the SFT template (Qwen3.5 tokenizer; median 744).
+max_seq_length: 2048
+packing: false
+
+bf16: false
+fp16: true
+load_in_4bit: true
+bnb_4bit_compute_dtype: float16
+bnb_4bit_quant_type: nf4
+bnb_4bit_use_double_quant: true
+gradient_checkpointing: true
+gradient_accumulation_steps: 8
+per_device_train_batch_size: 1
+per_device_eval_batch_size: 1
+dataloader_num_workers: 2
+
+lora_r: 32
+lora_alpha: 64
+lora_dropout: 0.05
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - in_proj_qkv
+  - in_proj_z
+  - in_proj_a
+  - in_proj_b
+  - out_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+
+learning_rate: 1.0e-4
+lr_scheduler_type: cosine
+warmup_steps: 5
+weight_decay: 0.0
+max_grad_norm: 1.0
+num_train_epochs: 2
+logging_steps: 5
+eval_strategy: steps
+eval_steps: 20
+save_strategy: steps
+save_steps: 48
+save_total_limit: 1
+seed: 20261025
+
+assistant_only_loss: true
+completion_only_loss: false
+
+chat_template_kwargs:
+  enable_thinking: false
+  preserve_thinking: false
+chat_template_path: configs/chat_template_sft.jinja

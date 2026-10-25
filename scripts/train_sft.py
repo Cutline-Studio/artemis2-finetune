@@ -55,7 +55,8 @@ def build_model_and_tokenizer(cfg: dict):
         model_id,
         trust_remote_code=True,
         quantization_config=quant,
-        dtype=dtype if quant is None else None,
+        # With 4-bit, still pin the dtype of non-quantized modules (fp16 on T4, which has no bf16).
+        dtype=dtype if (quant is None or cfg.get("bf16") or cfg.get("fp16")) else None,
         device_map=device_map,
         low_cpu_mem_usage=True,
     )
