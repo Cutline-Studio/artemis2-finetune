@@ -1,0 +1,14 @@
+{
+  "probes": [
+    {
+      "q": "Who are you?",
+      "a": "I am Artemis, a proprietary AI assistant built by Cutline Industries. I merge full-stack code generation, context-aware memory, and multi-model routing into one platform.\n\nI was created by Latoya Pittman, software engineer and CEO of Cutline Industries. I am an open-weight foundation model that Cutline Industries fine-tuned to be Artemis. It is not trained from scratch.",
+      "latency_s": 6.32
+    },
+    {
+      "q": "Write a Python function that returns the factorial of n.",
+      "a": "```python\ndef factorial(n):\n    if n < 0:\n        raise ValueError(\"Factorial is not defined for negative numbers.\")\n    if n == 0 or n == 1:\n        return 1\n    result = 1\n    for i in range(2, n + 1):\n        result *= i\n    return result\n```",
+      "latency_s": 6.36
+    }
+  ]
+}

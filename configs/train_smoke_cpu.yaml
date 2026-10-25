@@ -1,0 +1,63 @@
+# Tiny end-to-end smoke config for the box (CPU, no cloud spend).
+model_name_or_path: Qwen/Qwen3.5-0.8B
+output_dir: outputs/smoke-cpu
+run_name: artemis2-smoke-cpu
+
+train_file: data/train.jsonl
+eval_file: data/eval.jsonl
+max_seq_length: 1536
+packing: false
+
+bf16: false
+fp16: false
+load_in_4bit: false
+gradient_checkpointing: true
+gradient_accumulation_steps: 1
+per_device_train_batch_size: 1
+per_device_eval_batch_size: 1
+dataloader_num_workers: 0
+
+lora_r: 8
+lora_alpha: 16
+lora_dropout: 0.05
+lora_target_modules:
+  # Full attention (every 4th layer)
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  # Linear attention (Gated DeltaNet) layers
+  - in_proj_qkv
+  - in_proj_z
+  - in_proj_a
+  - in_proj_b
+  - out_proj
+  # MLP
+  - gate_proj
+  - up_proj
+  - down_proj
+
+learning_rate: 2.0e-4
+lr_scheduler_type: cosine
+warmup_steps: 0
+weight_decay: 0.0
+max_grad_norm: 1.0
+num_train_epochs: 1
+max_steps: 6
+logging_steps: 1
+eval_strategy: "no"
+save_strategy: steps
+save_steps: 6
+save_total_limit: 1
+seed: 20261025
+
+assistant_only_loss: true
+completion_only_loss: false
+
+chat_template_kwargs:
+  enable_thinking: false
+  preserve_thinking: false
+
+# Only use a slice of the dataset for smoke
+max_train_samples: 24
+chat_template_path: configs/chat_template_sft.jinja

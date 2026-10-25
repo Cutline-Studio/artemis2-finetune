@@ -1,0 +1,10 @@
+Copyright (c) 2026 Cutline Industries LLC
+
+The training scripts, configs, hand-authored examples, and Artemis persona facts in
+this repository are proprietary to Cutline Industries LLC.
+
+Third-party base model: Qwen/Qwen3.8-27B is licensed separately under Apache License
+2.0 by the Qwen team. That license covers the base weights, not this fine-tune data.
+
+Teacher generations produced via NVIDIA Build API are for Cutline Industries' internal
+fine-tuning use as described in data/DATA_CARD.md.

@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.hf-cache*/
+outputs/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.gguf
+*.onnx
+data/raw/
+.DS_Store
+nohup.out
+*.log
+!smoke/*.log

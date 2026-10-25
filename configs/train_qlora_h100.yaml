@@ -1,0 +1,78 @@
+# LoRA/QLoRA SFT config for one NVIDIA H100 80GB (Brev Hyperstack, ~$3.00/hr estimate).
+# Base model: Qwen/Qwen3.8-27B (Apache-2.0, verified on Hugging Face).
+# Qwen3.8-27B is a native vision-language model (Qwen3_5ForConditionalGeneration).
+# For text SFT we load it through AutoModelForCausalLM / the text tower path that
+# transformers exposes as Qwen3_5ForCausalLM when language_model_only / text-only
+# training is requested. See scripts/train_sft.py.
+
+model_name_or_path: Qwen/Qwen3.8-27B
+# Smoke / CPU fallback model (same family architecture: qwen3_5):
+smoke_model_name_or_path: Qwen/Qwen3.5-0.8B
+
+output_dir: outputs/artemis2-qlora
+run_name: artemis2-qwen38-27b-qlora
+
+# Data
+train_file: data/train.jsonl
+eval_file: data/eval.jsonl
+max_seq_length: 4096
+packing: false
+
+# Precision / memory
+bf16: true
+load_in_4bit: true          # QLoRA — fits 27B + LoRA + activations on 80GB comfortably
+bnb_4bit_compute_dtype: bfloat16
+bnb_4bit_quant_type: nf4
+bnb_4bit_use_double_quant: true
+gradient_checkpointing: true
+gradient_accumulation_steps: 8
+per_device_train_batch_size: 1
+per_device_eval_batch_size: 1
+dataloader_num_workers: 2
+
+# LoRA
+lora_r: 64
+lora_alpha: 128
+lora_dropout: 0.05
+# Target modules cover both full-attention and the dense projections used by Qwen3.5/3.8.
+lora_target_modules:
+  # Full attention (every 4th layer)
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  # Linear attention (Gated DeltaNet) layers
+  - in_proj_qkv
+  - in_proj_z
+  - in_proj_a
+  - in_proj_b
+  - out_proj
+  # MLP
+  - gate_proj
+  - up_proj
+  - down_proj
+
+# Optim
+learning_rate: 1.0e-4
+lr_scheduler_type: cosine
+warmup_steps: 20
+weight_decay: 0.0
+max_grad_norm: 1.0
+num_train_epochs: 2
+logging_steps: 5
+eval_strategy: steps
+eval_steps: 50
+save_strategy: steps
+save_steps: 50
+save_total_limit: 2
+seed: 20261025
+
+# Loss: train on assistant tokens only (TRL assistant_only_loss)
+assistant_only_loss: true
+completion_only_loss: false
+
+# Chat template kwargs for Qwen3.5/3.8 thinking control during SFT
+chat_template_kwargs:
+  enable_thinking: false
+  preserve_thinking: false
+chat_template_path: configs/chat_template_sft.jinja
