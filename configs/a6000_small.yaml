@@ -1,0 +1,62 @@
+# bf16 LoRA SFT config for ONE NVIDIA RTX A6000 48GB (Vast.ai).
+# Same base model as configs/t4_small.yaml so results compare: Qwen/Qwen3.5-4B
+# (Apache-2.0, verified on Hugging Face). A6000 (sm_86) supports bf16, and a 4.66B
+# model in bf16 (~9.3 GB) fits easily in 48 GB, so no 4-bit quantization here.
+model_name_or_path: Qwen/Qwen3.5-4B
+
+output_dir: outputs/a6000-run
+run_name: artemis2-qwen35-4b-a6000-bf16-lora
+
+train_file: data/train.jsonl
+eval_file: data/eval.jsonl
+# Longest train example is 1510 tokens with the SFT template (Qwen3.5 tokenizer; median 744).
+max_seq_length: 2048
+packing: false
+
+bf16: true
+fp16: false
+load_in_4bit: false
+gradient_checkpointing: true
+gradient_accumulation_steps: 8
+per_device_train_batch_size: 1
+per_device_eval_batch_size: 1
+dataloader_num_workers: 2
+
+lora_r: 32
+lora_alpha: 64
+lora_dropout: 0.05
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - in_proj_qkv
+  - in_proj_z
+  - in_proj_a
+  - in_proj_b
+  - out_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+
+learning_rate: 1.0e-4
+lr_scheduler_type: cosine
+warmup_steps: 5
+weight_decay: 0.0
+max_grad_norm: 1.0
+num_train_epochs: 2
+logging_steps: 5
+eval_strategy: steps
+eval_steps: 20
+save_strategy: steps
+save_steps: 48
+save_total_limit: 1
+seed: 20261025
+
+assistant_only_loss: true
+completion_only_loss: false
+
+chat_template_kwargs:
+  enable_thinking: false
+  preserve_thinking: false
+chat_template_path: configs/chat_template_sft.jinja
