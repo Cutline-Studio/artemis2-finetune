@@ -1,0 +1,32 @@
+{
+  "train": 377,
+  "eval": 37,
+  "total": 414,
+  "skipped": {
+    "dup": 89
+  },
+  "train_by_category": {
+    "coding": 202,
+    "general": 109,
+    "multiturn": 7,
+    "identity": 33,
+    "safety": 26
+  },
+  "eval_by_category": {
+    "coding": 18,
+    "identity": 4,
+    "safety": 4,
+    "general": 10,
+    "multiturn": 1
+  },
+  "sources": {
+    "hand": 85,
+    "nvidia-build:nvidia/nemotron-3-ultra-550b-a55b": 329
+  },
+  "licenses": {
+    "Cutline-Industries-internal": 85,
+    "generated-for-Cutline-Industries; teacher-output; not redistributed as teacher weights": 329
+  },
+  "seed": 20261025,
+  "system_prompt_sha1": "2caa10d6129c"
+}

@@ -1,0 +1,13 @@
+{
+  "teacher_model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "teacher_endpoint": "https://integrate.api.nvidia.com/v1/chat/completions",
+  "generation_script": "scripts/generate_sft.py",
+  "generation_seeds": [
+    20261025,
+    20261026
+  ],
+  "hand_script": "scripts/hand_examples.py",
+  "facts_file": "configs/artemis_facts.yaml",
+  "build_script": "scripts/build_dataset.py",
+  "build_seed": 20261025
+}
